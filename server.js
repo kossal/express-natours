@@ -1,8 +1,19 @@
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
+
 // Config file
 dotenv.config({ path: './config.env' });
 const app = require('./app');
+
+// Global exception failure handle safety net
+process.on('uncaughtException', err => {
+    // eslint-disable-next-line no-console
+    console.log('UNHANDLE EXCEPTION: shutting down...');
+    // eslint-disable-next-line no-console
+    console.log(err.name, err.message);
+
+    process.exit(1); // 0 success 1 uncaught exception
+});
 
 // Using SET NODE_ENV writes a whitespace at the end, so trim it
 if (process.env.NODE_ENV.trim() === 'production') {
@@ -33,33 +44,25 @@ mongoose
         useNewUrlParser: true,
         useCreateIndex: true,
         useFindAndModify: false,
-    })
+    }) // eslint-disable-next-line no-console
     .then(() => console.log(`DB connection successfull`));
 
 // Server listening
 const PORT = process.env.PORT || 8000;
 const server = app.listen(PORT, () =>
+    // eslint-disable-next-line no-console
     console.log(`http server listening in port ${PORT}...`)
 );
 
-// Global promise rejection handle safety net
+// Global unhandle promise failure safety net
 process.on('unhandledRejection', err => {
-    console.log(err.name, err.message);
+    // eslint-disable-next-line no-console
     console.log('UNHANDLE REJECTION: shutting down...');
+    // eslint-disable-next-line no-console
+    console.log(err.name, err.message);
 
     // Gracefully close server and then exit node
     server.close(() => {
         process.exit(1); // 0 success 1 uncaught exception
     });
 });
-
-// Global promise rejection handle safety net
-/*process.on('uncaught', err => {
-  console.log(err.name, err.message);
-  console.log('UNHANDLE REJECTION: shutting down...');
-
-  // Gracefully close server and then exit node
-  server.close(() => {
-      process.exit(1); // 0 success 1 uncaught exception
-  });
-});*/

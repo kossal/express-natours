@@ -26,8 +26,10 @@ app.use(express.static(`${__dirname}/public`));
 
 // Routers
 const tourRouter = require('./routes/tourRouter');
+const userRouter = require('./routes/userRouter');
 
 app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
 // Error management
 app.all('*', (req, res, next) => {

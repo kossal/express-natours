@@ -34,7 +34,6 @@ const sendDevError = (err, res) => {
 
 const sendProdError = (err, res) => {
     // If known problem then leak it
-    console.log(err.isOperational);
     if (err.isOperational) {
         res.status(err.statusCode).json({
             status: err.status,
